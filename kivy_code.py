@@ -7,7 +7,7 @@ from kivy.properties import ObjectProperty
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 import Create_folder as cf
-#import Camera as c
+import camera as c
 
 
 class MainWindow(Screen):
