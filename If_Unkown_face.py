@@ -2,23 +2,25 @@ import cv2
 import numpy as np
 import face_recognition
 import os
-from datetime import datetime
 import Project as kc
+from datetime import datetime
+
+
+
 
 # from PIL import ImageGrab
+def iuf():
+    path = 'image_folder'
+    images = []
+    classNames = []
+    myList = os.listdir(path)
+    print(myList)
+    for cl in myList:
+        curImg = cv2.imread(f'{path}/{cl}')
+        images.append(curImg)
+        classNames.append(os.path.splitext(cl)[0])
+    print(classNames)
 
-path = 'image_folder'
-images = []
-classNames = []
-myList = os.listdir(path)
-print(myList)
-for cl in myList:
-    curImg = cv2.imread(f'{path}/{cl}')
-    images.append(curImg)
-    classNames.append(os.path.splitext(cl)[0])
-print(classNames)
-
-def fd():
     def findEncodings(images):
         encodeList = []
         for img in images:
@@ -27,25 +29,26 @@ def fd():
             encodeList.append(encode)
         return encodeList
 
-
     def markAttendance(name):
+
         with open('Attendence.csv', 'r+') as f:
             myDataList = f.readlines()
             nameList = []
             for line in myDataList:
-                entry = line.split(' , ')
-                nameList.append(entry[5])
-            if name not in nameList:
+                entry = line.split(',')
+                nameList.append(entry[0])
+            if name not in nameList :
                 now = datetime.now()
                 dtString = now.strftime('%H:%M:%S')
-                f.write(f'n{name},{dtString},')
+                f.writelines(f'\n{name},{dtString}')    
+
+
 
         #### FOR CAPTURING SCREEN RATHER THAN WEBCAM
         # def captureScreen(bbox=(300,300,690+300,530+300)):
         #     capScr = np.array(ImageGrab.grab(bbox))
         #     capScr = cv2.cvtColor(capScr, cv2.COLOR_RGB2BGR)
         #     return capScr
-
 
     encodeListKnown = findEncodings(images)
     print('Encoding Complete', len(encodeListKnown))
@@ -60,11 +63,13 @@ def fd():
 
         facesCurFrame = face_recognition.face_locations(imgS)
         encodesCurFrame = face_recognition.face_encodings(imgS, facesCurFrame)
+        e = 0
         for encodeFace, faceLoc in zip(encodesCurFrame, facesCurFrame):
             matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
             faceDis = face_recognition.face_distance(encodeListKnown, encodeFace)
             # print(faceDis)
             matchIndex = np.argmin(faceDis)
+            name = ''
 
             if matches[matchIndex]:
                 name = classNames[matchIndex].upper()
@@ -75,19 +80,21 @@ def fd():
                 cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
                 cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
                 markAttendance(name)
-            '''else:
+            else:
                 name = 'Unknown'
-                # print(name)
                 y1, x2, y2, x1 = faceLoc
                 y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
                 cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
                 cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
-                markAttendance("Unknown")'''
-        k = cv2.waitKey(1)
-        if k % 256 == 27:
-            # ESC pressed
-            print("Escape hit, closing...")
-            break
+                return name
+                #kc.kcode()
+
+            '''k = cv2.waitKey(1)
+            if k % 256 == 27:
+                # ESC pressed
+                print("Escape hit, closing...")
+                kc.MyApp().run()
+                break'''
         cv2.imshow('Webcam', img)
         cv2.waitKey(1)

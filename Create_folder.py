@@ -1,5 +1,4 @@
-import kivy_code
-from kivy_code import SecondWindow
+
 
 def New_Folder(name):
     import os

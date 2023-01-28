@@ -1,7 +1,9 @@
 WindowManager:
     MainWindow:
     SecondWindow:
+    CameraClick:
     ThirdWindow:
+
 <Label>
     background_color: (1,0.5,0.6,1)
     font_size: 30
@@ -43,9 +45,8 @@ WindowManager:
 
         Button:
             text: "Sumbit"
-            on_press: root.press()
             on_release:
-                app.root.current = "third"
+                app.root.current = "camera"
 
                 root.manager.transition.direction = 'left'
 
@@ -55,15 +56,42 @@ WindowManager:
             on_release:
                 app.root.current = "third"
                 root.manager.transition.direction = 'left'
-
+<CameraClick>:
+    name: "camera"
+    orientation: 'vertical'
+    #text : root.auth(SecondWindow.ids.namee.text)
+    Camera:
+        id: camera
+        resolution: (640, 480)
+        play: False
+    ToggleButton:
+        text: 'Play'
+        on_press: camera.play = not camera.play
+        size_hint_y: None
+        height: '48dp'
+    Button:
+        text: 'Capture'
+        size_hint_y: None
+        height: '48dp'
+        on_press: root.capture()
 
 <ThirdWindow>:
     name: "third"
-    Button:
-        text: "Back"
-        on_release:
-            app.root.current = "main"
-            root.manager.transition.direction = "down"
+    BoxLayout:
+        orientation: "vertical"
+        size: root.width,root.height
+        spacing:10
+        padding:40
+        Label:
+            text: "Show your face"
+        Button:
+            text:"Finish"
+            on_press: root.press()
+        Button:
+            text:"Add Another User"
+            on_release:
+                app.root.current = "second"
+                root.manager.transition.direction = 'right'
 
 
 
